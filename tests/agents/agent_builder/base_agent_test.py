@@ -31,7 +31,7 @@ class MockAgent(BaseAgent):
 def test_key():
     agent = MockAgent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
     )
     hash = hashlib.md5("test role|test goal|test backstory".encode()).hexdigest()

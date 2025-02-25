@@ -33,7 +33,7 @@ def test_agent_llm_creation_with_env_vars():
     os.environ["OPENAI_MODEL_NAME"] = "gpt-4-turbo"
 
     # Create an agent without specifying LLM
-    agent = Agent(role="test role", goal="test goal", backstory="test backstory")
+    agent = Agent(role="test role", desire="test goal", backstory="test backstory")
 
     # Check if LLM is created correctly
     assert isinstance(agent.llm, LLM)
@@ -47,7 +47,7 @@ def test_agent_llm_creation_with_env_vars():
     del os.environ["OPENAI_MODEL_NAME"]
 
     # Create an agent without specifying LLM
-    agent = Agent(role="test role", goal="test goal", backstory="test backstory")
+    agent = Agent(role="test role", desire="test goal", backstory="test backstory")
 
     # Check if LLM is created correctly
     assert isinstance(agent.llm, LLM)
@@ -65,23 +65,23 @@ def test_agent_llm_creation_with_env_vars():
 
 
 def test_agent_creation():
-    agent = Agent(role="test role", goal="test goal", backstory="test backstory")
+    agent = Agent(role="test role", desire="test goal", backstory="test backstory")
 
     assert agent.role == "test role"
-    assert agent.goal == "test goal"
+    assert agent.desire == "test goal"
     assert agent.backstory == "test backstory"
     assert agent.tools == []
 
 
 def test_agent_default_values():
-    agent = Agent(role="test role", goal="test goal", backstory="test backstory")
+    agent = Agent(role="test role", desire="test goal", backstory="test backstory")
     assert agent.llm.model == "gpt-4o-mini"
     assert agent.allow_delegation is False
 
 
 def test_custom_llm():
     agent = Agent(
-        role="test role", goal="test goal", backstory="test backstory", llm="gpt-4"
+        role="test role", desire="test goal", backstory="test backstory", llm="gpt-4"
     )
     assert agent.llm.model == "gpt-4"
 
@@ -91,7 +91,7 @@ def test_custom_llm_with_langchain():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=ChatOpenAI(temperature=0, model="gpt-4"),
     )
@@ -105,7 +105,7 @@ def test_custom_llm_temperature_preservation():
     langchain_llm = ChatOpenAI(temperature=0.7, model="gpt-4")
     agent = Agent(
         role="temperature test role",
-        goal="temperature test goal",
+        desire="temperature test goal",
         backstory="temperature test backstory",
         llm=langchain_llm,
     )
@@ -119,7 +119,7 @@ def test_custom_llm_temperature_preservation():
 def test_agent_execution():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         allow_delegation=False,
     )
@@ -143,7 +143,7 @@ def test_agent_execution_with_tools():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         tools=[multiplier],
         allow_delegation=False,
@@ -174,7 +174,7 @@ def test_logging_tool_usage():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         tools=[multiplier],
         verbose=True,
@@ -210,7 +210,7 @@ def test_cache_hitting():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         tools=[multiplier],
         allow_delegation=False,
@@ -282,7 +282,7 @@ def test_disabling_cache_for_agent():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         tools=[multiplier],
         allow_delegation=False,
@@ -344,7 +344,7 @@ def test_agent_execution_with_specific_tools():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         allow_delegation=False,
     )
@@ -367,7 +367,7 @@ def test_agent_powered_by_new_o_model_family_that_allows_skipping_tool():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm="o1-preview",
         max_iter=3,
@@ -393,7 +393,7 @@ def test_agent_powered_by_new_o_model_family_that_uses_tool():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm="o1-preview",
         max_iter=3,
@@ -420,7 +420,7 @@ def test_agent_custom_max_iterations():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=1,
         allow_delegation=False,
@@ -450,7 +450,7 @@ def test_agent_repeated_tool_usage(capsys):
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=4,
         llm="gpt-4",
@@ -487,7 +487,7 @@ def test_agent_repeated_tool_usage_check_even_with_disabled_cache(capsys):
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=4,
         llm="gpt-4",
@@ -523,7 +523,7 @@ def test_agent_moved_on_after_max_iterations():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=3,
         allow_delegation=False,
@@ -549,7 +549,7 @@ def test_agent_respect_the_max_rpm_set(capsys):
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=5,
         max_rpm=1,
@@ -587,7 +587,7 @@ def test_agent_respect_the_max_rpm_set_over_crew_rpm(capsys):
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=4,
         max_rpm=10,
@@ -624,7 +624,7 @@ def test_agent_without_max_rpm_respects_crew_rpm(capsys):
 
     agent1 = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_rpm=10,
         max_iter=2,
@@ -634,7 +634,7 @@ def test_agent_without_max_rpm_respects_crew_rpm(capsys):
 
     agent2 = Agent(
         role="test role2",
-        goal="test goal2",
+        desire="test goal2",
         backstory="test backstory2",
         max_iter=5,
         verbose=True,
@@ -685,7 +685,7 @@ def test_agent_error_on_parsing_tool(capsys):
 
     agent1 = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=1,
         verbose=True,
@@ -728,7 +728,7 @@ def test_agent_remembers_output_format_after_using_tools_too_many_times():
 
     agent1 = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_iter=6,
         verbose=True,
@@ -751,8 +751,8 @@ def test_agent_remembers_output_format_after_using_tools_too_many_times():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_use_specific_tasks_output_as_context(capsys):
-    agent1 = Agent(role="test role", goal="test goal", backstory="test backstory")
-    agent2 = Agent(role="test role2", goal="test goal2", backstory="test backstory2")
+    agent1 = Agent(role="test role", desire="test goal", backstory="test backstory")
+    agent2 = Agent(role="test role2", desire="test goal2", backstory="test backstory2")
 
     say_hi_task = Task(
         description="Just say hi.", agent=agent1, expected_output="Your greeting."
@@ -791,7 +791,7 @@ def test_agent_step_callback():
 
         agent1 = Agent(
             role="test role",
-            goal="test goal",
+            desire="test goal",
             backstory="test backstory",
             tools=[learn_about_AI],
             step_callback=StepCallback().callback,
@@ -821,7 +821,7 @@ def test_agent_function_calling_llm():
 
     agent1 = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         tools=[learn_about_AI],
         llm="gpt-4o",
@@ -862,7 +862,7 @@ def test_agent_count_formatting_error():
 
     agent1 = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         verbose=True,
     )
@@ -889,7 +889,7 @@ def test_tool_result_as_answer_is_the_final_answer_for_the_agent():
 
     agent1 = Agent(
         role="Data Scientist",
-        goal="Product amazing resports on AI",
+        desire="Product amazing resports on AI",
         backstory="You work with data and AI",
         tools=[MyCustomTool(result_as_answer=True)],
     )
@@ -919,7 +919,7 @@ def test_tool_usage_information_is_appended_to_agent():
 
     agent1 = Agent(
         role="Friendly Neighbor",
-        goal="Make everyone feel welcome",
+        desire="Make everyone feel welcome",
         backstory="You are the friendly neighbor",
         tools=[MyCustomTool(result_as_answer=True)],
     )
@@ -954,7 +954,7 @@ def test_agent_definition_based_on_dict():
     agent = Agent(**config)
 
     assert agent.role == "test role"
-    assert agent.goal == "test goal"
+    assert agent.desire == "test goal"
     assert agent.backstory == "test backstory"
     assert agent.verbose is True
     assert agent.tools == []
@@ -1005,25 +1005,25 @@ def test_agent_human_input():
 def test_interpolate_inputs():
     agent = Agent(
         role="{topic} specialist",
-        goal="Figure {goal} out",
+        desire="Figure {goal} out",
         backstory="I am the master of {role}",
     )
 
     agent.interpolate_inputs({"topic": "AI", "goal": "life", "role": "all things"})
     assert agent.role == "AI specialist"
-    assert agent.goal == "Figure life out"
+    assert agent.desire == "Figure life out"
     assert agent.backstory == "I am the master of all things"
 
     agent.interpolate_inputs({"topic": "Sales", "goal": "stuff", "role": "nothing"})
     assert agent.role == "Sales specialist"
-    assert agent.goal == "Figure stuff out"
+    assert agent.desire == "Figure stuff out"
     assert agent.backstory == "I am the master of nothing"
 
 
 def test_not_using_system_prompt():
     agent = Agent(
         role="{topic} specialist",
-        goal="Figure {goal} out",
+        desire="Figure {goal} out",
         backstory="I am the master of {role}",
         use_system_prompt=False,
     )
@@ -1036,7 +1036,7 @@ def test_not_using_system_prompt():
 def test_using_system_prompt():
     agent = Agent(
         role="{topic} specialist",
-        goal="Figure {goal} out",
+        desire="Figure {goal} out",
         backstory="I am the master of {role}",
     )
 
@@ -1048,7 +1048,7 @@ def test_using_system_prompt():
 def test_system_and_prompt_template():
     agent = Agent(
         role="{topic} specialist",
-        goal="Figure {goal} out",
+        desire="Figure {goal} out",
         backstory="I am the master of {role}",
         system_template="""<|start_header_id|>system<|end_header_id|>
 
@@ -1102,7 +1102,7 @@ def test_agent_training_handler(crew_training_handler):
     task_prompt = "What is 1 + 1?"
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         verbose=True,
     )
@@ -1124,7 +1124,7 @@ def test_agent_use_trained_data(crew_training_handler):
     task_prompt = "What is 1 + 1?"
     agent = Agent(
         role="researcher",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         verbose=True,
     )
@@ -1151,7 +1151,7 @@ def test_agent_use_trained_data(crew_training_handler):
 def test_agent_max_retry_limit():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         max_retry_limit=1,
     )
@@ -1204,7 +1204,7 @@ def test_agent_max_retry_limit():
 def test_agent_with_llm():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo", temperature=0.7),
     )
@@ -1218,7 +1218,7 @@ def test_agent_with_custom_stop_words():
     stop_words = ["STOP", "END"]
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo", stop=stop_words),
     )
@@ -1235,7 +1235,7 @@ def test_agent_with_callbacks():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo", callbacks=[dummy_callback]),
     )
@@ -1248,7 +1248,7 @@ def test_agent_with_callbacks():
 def test_agent_with_additional_kwargs():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(
             model="gpt-3.5-turbo",
@@ -1289,7 +1289,7 @@ def test_llm_call_with_error():
 def test_handle_context_length_exceeds_limit():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
     )
     original_action = AgentAction(
@@ -1333,7 +1333,7 @@ def test_handle_context_length_exceeds_limit():
 def test_handle_context_length_exceeds_limit_cli_no():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         sliding_context_window=False,
     )
@@ -1360,7 +1360,7 @@ def test_handle_context_length_exceeds_limit_cli_no():
 def test_agent_with_all_llm_attributes():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(
             model="gpt-3.5-turbo",
@@ -1425,7 +1425,7 @@ def test_llm_call_with_all_attributes():
 def test_agent_with_ollama_llama3():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="ollama/llama3.2:3b", base_url="http://localhost:11434"),
     )
@@ -1465,7 +1465,7 @@ def test_llm_call_with_ollama_llama3():
 def test_agent_execute_task_basic():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm="gpt-4o-mini",
     )
@@ -1484,7 +1484,7 @@ def test_agent_execute_task_basic():
 def test_agent_execute_task_with_context():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo"),
     )
@@ -1511,7 +1511,7 @@ def test_agent_execute_task_with_tool():
 
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo"),
         tools=[dummy_tool],
@@ -1531,7 +1531,7 @@ def test_agent_execute_task_with_tool():
 def test_agent_execute_task_with_custom_llm():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-3.5-turbo", temperature=0.7, max_tokens=50),
     )
@@ -1552,7 +1552,7 @@ def test_agent_execute_task_with_custom_llm():
 def test_agent_execute_task_with_ollama():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="ollama/llama3.2:3b", base_url="http://localhost:11434"),
     )
@@ -1583,7 +1583,7 @@ def test_agent_with_knowledge_sources():
 
         agent = Agent(
             role="Information Agent",
-            goal="Provide information based on knowledge sources",
+            desire="Provide information based on knowledge sources",
             backstory="You have access to specific knowledge sources.",
             llm=LLM(model="gpt-4o-mini"),
             knowledge_sources=[string_source],
@@ -1618,7 +1618,7 @@ def test_agent_with_knowledge_sources_works_with_copy():
 
         agent = Agent(
             role="Information Agent",
-            goal="Provide information based on knowledge sources",
+            desire="Provide information based on knowledge sources",
             backstory="You have access to specific knowledge sources.",
             llm=LLM(model="gpt-4o-mini"),
             knowledge_sources=[string_source],
@@ -1633,7 +1633,7 @@ def test_agent_with_knowledge_sources_works_with_copy():
             agent_copy = agent.copy()
 
             assert agent_copy.role == agent.role
-            assert agent_copy.goal == agent.goal
+            assert agent_copy.goal == agent.desire
             assert agent_copy.backstory == agent.backstory
             assert agent_copy.knowledge_sources is not None
             assert len(agent_copy.knowledge_sources) == 1
@@ -1650,7 +1650,7 @@ def test_litellm_auth_error_handling():
     # Create an agent with a mocked LLM and max_retry_limit=0
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-4"),
         max_retry_limit=0,  # Disable retries for authentication errors
@@ -1687,7 +1687,7 @@ def test_crew_agent_executor_litellm_auth_error():
     # Create an agent and executor
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="gpt-4", api_key="invalid_api_key"),
     )
@@ -1753,7 +1753,7 @@ def test_litellm_anthropic_error_handling():
     # Create an agent with a mocked LLM that uses an Anthropic model
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         llm=LLM(model="claude-3.5-sonnet-20240620"),
         max_retry_limit=0,

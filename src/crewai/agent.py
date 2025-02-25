@@ -41,13 +41,13 @@ except ImportError:
 class Agent(BaseAgent):
     """Represents an agent in a system.
 
-    Each agent has a role, a goal, a backstory, and an optional language model (llm).
+    Each agent has a role, a desire, a backstory, and an optional language model (llm).
     The agent can also have memory, can operate in verbose mode, and can delegate tasks to other agents.
 
     Attributes:
             agent_executor: An instance of the CrewAgentExecutor class.
             role: The role of the agent.
-            goal: The objective of the agent.
+            desire: The objective of the agent.
             backstory: The backstory of the agent.
             knowledge: The knowledge base of the agent.
             config: Dict representation of agent configuration.
@@ -162,14 +162,14 @@ class Agent(BaseAgent):
     def execute_task(
         self,
         task: Task,
-        context: Optional[str] = None,
+        belief: Optional[str] = None,
         tools: Optional[List[BaseTool]] = None,
     ) -> str:
         """Execute a task with the agent.
 
         Args:
             task: Task to execute.
-            context: Context to execute the task in.
+            belief: Context to execute the task in.
             tools: Tools to use for the task.
 
         Returns:
@@ -198,9 +198,9 @@ class Agent(BaseAgent):
                     "formatted_task_instructions"
                 ).format(output_format=schema)
 
-        if context:
+        if belief:
             task_prompt = self.i18n.slice("task_with_context").format(
-                task=task_prompt, context=context
+                task=task_prompt, belief=belief
             )
 
         if self.crew and self.crew.memory:
@@ -211,7 +211,7 @@ class Agent(BaseAgent):
                 self.crew._entity_memory,
                 self.crew._user_memory,
             )
-            memory = contextual_memory.build_context_for_task(task, context)
+            memory = contextual_memory.build_context_for_task(task, belief)
             if memory.strip() != "":
                 task_prompt += self.i18n.slice("memory").format(memory=memory)
 
@@ -255,7 +255,7 @@ class Agent(BaseAgent):
             self._times_executed += 1
             if self._times_executed > self.max_retry_limit:
                 raise e
-            result = self.execute_task(task, context, tools)
+            result = self.execute_task(task, belief, tools)
 
         if self.max_rpm and self._rpm_controller:
             self._rpm_controller.stop_rpm_counter()
@@ -449,4 +449,6 @@ class Agent(BaseAgent):
         return ", ".join([t.name for t in tools])
 
     def __repr__(self):
-        return f"Agent(role={self.role}, goal={self.goal}, backstory={self.backstory})"
+        return (
+            f"Agent(role={self.role}, desire={self.desire}, backstory={self.backstory})"
+        )

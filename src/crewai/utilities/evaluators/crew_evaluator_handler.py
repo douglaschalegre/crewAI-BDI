@@ -47,7 +47,7 @@ class CrewEvaluator:
     def _evaluator_agent(self):
         return Agent(
             role="Task Execution Evaluator",
-            goal=(
+            desire=(
                 "Your goal is to evaluate the performance of the agents in the crew based on the tasks they have performed using score from 1 to 10 evaluating on completion, quality, and overall performance."
             ),
             backstory="Evaluator agent for crew evaluation with precise capabilities to evaluate the performance of the agents in the crew based on the tasks they have performed",
@@ -64,7 +64,7 @@ class CrewEvaluator:
                 f"task_description: {task_to_evaluate.description} "
                 f"task_expected_output: {task_to_evaluate.expected_output} "
                 f"agent: {task_to_evaluate.agent.role if task_to_evaluate.agent else None} "
-                f"agent_goal: {task_to_evaluate.agent.goal if task_to_evaluate.agent else None} "
+                f"agent_goal: {task_to_evaluate.agent.desire if task_to_evaluate.agent else None} "
                 f"Task Output: {task_output}"
             ),
             expected_output="Evaluation Score from 1 to 10 based on the performance of the agents on the tasks",

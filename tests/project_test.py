@@ -10,7 +10,7 @@ class SimpleCrew:
     @agent
     def simple_agent(self):
         return Agent(
-            role="Simple Agent", goal="Simple Goal", backstory="Simple Backstory"
+            role="Simple Agent", desire="Simple Goal", backstory="Simple Backstory"
         )
 
     @task
@@ -68,9 +68,9 @@ def test_agent_memoization():
     first_call_result = crew.simple_agent()
     second_call_result = crew.simple_agent()
 
-    assert (
-        first_call_result is second_call_result
-    ), "Agent memoization is not working as expected"
+    assert first_call_result is second_call_result, (
+        "Agent memoization is not working as expected"
+    )
 
 
 def test_task_memoization():
@@ -78,9 +78,9 @@ def test_task_memoization():
     first_call_result = crew.simple_task()
     second_call_result = crew.simple_task()
 
-    assert (
-        first_call_result is second_call_result
-    ), "Task memoization is not working as expected"
+    assert first_call_result is second_call_result, (
+        "Task memoization is not working as expected"
+    )
 
 
 def test_crew_memoization():
@@ -88,21 +88,21 @@ def test_crew_memoization():
     first_call_result = crew.crew()
     second_call_result = crew.crew()
 
-    assert (
-        first_call_result is second_call_result
-    ), "Crew references should point to the same object"
+    assert first_call_result is second_call_result, (
+        "Crew references should point to the same object"
+    )
 
 
 def test_task_name():
     simple_task = SimpleCrew().simple_task()
-    assert (
-        simple_task.name == "simple_task"
-    ), "Task name is not inferred from function name as expected"
+    assert simple_task.name == "simple_task", (
+        "Task name is not inferred from function name as expected"
+    )
 
     custom_named_task = SimpleCrew().custom_named_task()
-    assert (
-        custom_named_task.name == "Custom"
-    ), "Custom task name is not being set as expected"
+    assert custom_named_task.name == "Custom", (
+        "Custom task name is not being set as expected"
+    )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])
@@ -119,9 +119,9 @@ def test_after_kickoff_modification():
     # Assuming the crew execution returns a dict
     result = crew.crew().kickoff({"topic": "LLMs"})
 
-    assert (
-        "post processed" in result.raw
-    ), "After kickoff function did not modify outputs"
+    assert "post processed" in result.raw, (
+        "After kickoff function did not modify outputs"
+    )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])

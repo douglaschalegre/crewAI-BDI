@@ -71,7 +71,7 @@ class Prompts(BaseModel):
             prompt = f"{system}\n{prompt}\n{response}"
 
         prompt = (
-            prompt.replace("{goal}", self.agent.goal)
+            prompt.replace("{desire}", self.agent.desire)
             .replace("{role}", self.agent.role)
             .replace("{backstory}", self.agent.backstory)
         )

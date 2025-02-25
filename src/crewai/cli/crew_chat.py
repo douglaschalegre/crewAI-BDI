@@ -415,7 +415,7 @@ def fetch_required_inputs(crew: Crew) -> Set[str]:
 
     # Scan agents
     for agent in crew.agents:
-        text = f"{agent.role or ''} {agent.goal or ''} {agent.backstory or ''}"
+        text = f"{agent.role or ''} {agent.desire or ''} {agent.backstory or ''}"
         required_inputs.update(placeholder_pattern.findall(text))
 
     return required_inputs
@@ -454,17 +454,19 @@ def generate_input_description_with_ai(input_name: str, crew: Crew, chat_llm) ->
     for agent in crew.agents:
         if (
             f"{{{input_name}}}" in agent.role
-            or f"{{{input_name}}}" in agent.goal
+            or f"{{{input_name}}}" in agent.desire
             or f"{{{input_name}}}" in agent.backstory
         ):
             # Replace placeholders with input names
             agent_role = placeholder_pattern.sub(lambda m: m.group(1), agent.role or "")
-            agent_goal = placeholder_pattern.sub(lambda m: m.group(1), agent.goal or "")
+            agent_desire = placeholder_pattern.sub(
+                lambda m: m.group(1), agent.desire or ""
+            )
             agent_backstory = placeholder_pattern.sub(
                 lambda m: m.group(1), agent.backstory or ""
             )
             context_texts.append(f"Agent Role: {agent_role}")
-            context_texts.append(f"Agent Goal: {agent_goal}")
+            context_texts.append(f"Agent Desire: {agent_desire}")
             context_texts.append(f"Agent Backstory: {agent_backstory}")
 
     context = "\n".join(context_texts)
@@ -512,12 +514,12 @@ def generate_crew_description_with_ai(crew: Crew, chat_llm) -> str:
     for agent in crew.agents:
         # Replace placeholders with input names
         agent_role = placeholder_pattern.sub(lambda m: m.group(1), agent.role or "")
-        agent_goal = placeholder_pattern.sub(lambda m: m.group(1), agent.goal or "")
+        agent_desire = placeholder_pattern.sub(lambda m: m.group(1), agent.desire or "")
         agent_backstory = placeholder_pattern.sub(
             lambda m: m.group(1), agent.backstory or ""
         )
         context_texts.append(f"Agent Role: {agent_role}")
-        context_texts.append(f"Agent Goal: {agent_goal}")
+        context_texts.append(f"Agent Desire: {agent_desire}")
         context_texts.append(f"Agent Backstory: {agent_backstory}")
 
     context = "\n".join(context_texts)

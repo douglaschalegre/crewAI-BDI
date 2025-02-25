@@ -434,20 +434,20 @@ class Crew(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_async_task_cannot_include_sequential_async_tasks_in_context(self):
+    def validate_async_task_cannot_include_sequential_async_tasks_in_belief(self):
         """
         Validates that if a task is set to be executed asynchronously,
         it cannot include other asynchronous tasks in its context unless
         separated by a synchronous task.
         """
         for i, task in enumerate(self.tasks):
-            if task.async_execution and task.context:
-                for context_task in task.context:
-                    if context_task.async_execution:
+            if task.async_execution and task.belief:
+                for belief_task in task.belief:
+                    if belief_task.async_execution:
                         for j in range(i - 1, -1, -1):
-                            if self.tasks[j] == context_task:
+                            if self.tasks[j] == belief_task:
                                 raise ValueError(
-                                    f"Task '{task.description}' is asynchronous and cannot include other sequential asynchronous tasks in its context."
+                                    f"Task '{task.description}' is asynchronous and cannot include other sequential asynchronous tasks in its belief."
                                 )
                             if not self.tasks[j].async_execution:
                                 break
@@ -459,13 +459,13 @@ class Crew(BaseModel):
         task_indices = {id(task): i for i, task in enumerate(self.tasks)}
 
         for task in self.tasks:
-            if task.context:
-                for context_task in task.context:
-                    if id(context_task) not in task_indices:
+            if task.belief:
+                for belief_task in task.belief:
+                    if id(belief_task) not in task_indices:
                         continue  # Skip context tasks not in the main tasks list
-                    if task_indices[id(context_task)] > task_indices[id(task)]:
+                    if task_indices[id(belief_task)] > task_indices[id(task)]:
                         raise ValueError(
-                            f"Task '{task.description}' has a context dependency on a future task '{context_task.description}', which is not allowed."
+                            f"Task '{task.description}' has a belief dependency on a future task '{belief_task.description}', which is not allowed."
                         )
         return self
 
@@ -714,7 +714,7 @@ class Crew(BaseModel):
             self.manager_llm = create_llm(self.manager_llm)
             manager = Agent(
                 role=i18n.retrieve("hierarchical_manager_agent", "role"),
-                goal=i18n.retrieve("hierarchical_manager_agent", "goal"),
+                desire=i18n.retrieve("hierarchical_manager_agent", "desire"),
                 backstory=i18n.retrieve("hierarchical_manager_agent", "backstory"),
                 tools=AgentTools(agents=self.agents).tools(),
                 allow_delegation=True,
@@ -775,12 +775,12 @@ class Crew(BaseModel):
                     continue
 
             if task.async_execution:
-                context = self._get_context(
+                belief = self._get_belief(
                     task, [last_sync_output] if last_sync_output else []
                 )
                 future = task.execute_async(
                     agent=agent_to_use,
-                    context=context,
+                    belief=belief,
                     tools=tools_for_task,
                 )
                 futures.append((task, future, task_index))
@@ -789,10 +789,10 @@ class Crew(BaseModel):
                     task_outputs = self._process_async_tasks(futures, was_replayed)
                     futures.clear()
 
-                context = self._get_context(task, task_outputs)
+                belief = self._get_belief(task, task_outputs)
                 task_output = task.execute_sync(
                     agent=agent_to_use,
-                    context=context,
+                    belief=belief,
                     tools=tools_for_task,
                 )
                 task_outputs.append(task_output)
@@ -918,13 +918,13 @@ class Crew(BaseModel):
                 )
         return tools
 
-    def _get_context(self, task: Task, task_outputs: List[TaskOutput]):
-        context = (
-            aggregate_raw_outputs_from_tasks(task.context)
-            if task.context
+    def _get_belief(self, task: Task, task_outputs: List[TaskOutput]):
+        belief = (
+            aggregate_raw_outputs_from_tasks(task.belief)
+            if task.belief
             else aggregate_raw_outputs_from_task_outputs(task_outputs)
         )
-        return context
+        return belief
 
     def _process_task_result(self, task: Task, output: TaskOutput) -> None:
         role = task.agent.role if task.agent is not None else "None"
@@ -1036,7 +1036,7 @@ class Crew(BaseModel):
         """
         Gathers placeholders (e.g., {something}) referenced in tasks or agents.
         Scans each task's 'description' + 'expected_output', and each agent's
-        'role', 'goal', and 'backstory'.
+        'role', 'desire', and 'backstory'.
 
         Returns a set of all discovered placeholder names.
         """
@@ -1051,8 +1051,8 @@ class Crew(BaseModel):
 
         # Scan agents for inputs
         for agent in self.agents:
-            # role, goal, backstory might have placeholders like {role_detail}, etc.
-            text = f"{agent.role or ''} {agent.goal or ''} {agent.backstory or ''}"
+            # role, desire, backstory might have placeholders like {role_detail}, etc.
+            text = f"{agent.role or ''} {agent.desire or ''} {agent.backstory or ''}"
             required_inputs.update(placeholder_pattern.findall(text))
 
         return required_inputs
@@ -1091,12 +1091,12 @@ class Crew(BaseModel):
             task_mapping[task.key] = cloned_task
 
         for cloned_task, original_task in zip(cloned_tasks, self.tasks):
-            if original_task.context:
-                cloned_context = [
-                    task_mapping[context_task.key]
-                    for context_task in original_task.context
+            if original_task.belief:
+                cloned_belief = [
+                    task_mapping[belief_task.key]
+                    for belief_task in original_task.belief
                 ]
-                cloned_task.context = cloned_context
+                cloned_task.belief = cloned_belief
 
         copied_data = self.model_dump(exclude=exclude)
         copied_data = {k: v for k, v in copied_data.items() if v is not None}

@@ -23,17 +23,17 @@ class InternalCrewPlanner:
             Task(
                 description="Task 1",
                 expected_output="Output 1",
-                agent=Agent(role="Agent 1", goal="Goal 1", backstory="Backstory 1"),
+                agent=Agent(role="Agent 1", desire="Goal 1", backstory="Backstory 1"),
             ),
             Task(
                 description="Task 2",
                 expected_output="Output 2",
-                agent=Agent(role="Agent 2", goal="Goal 2", backstory="Backstory 2"),
+                agent=Agent(role="Agent 2", desire="Goal 2", backstory="Backstory 2"),
             ),
             Task(
                 description="Task 3",
                 expected_output="Output 3",
-                agent=Agent(role="Agent 3", goal="Goal 3", backstory="Backstory 3"),
+                agent=Agent(role="Agent 3", desire="Goal 3", backstory="Backstory 3"),
             ),
         ]
         return CrewPlanner(tasks, None)
@@ -44,7 +44,7 @@ class InternalCrewPlanner:
             Task(
                 description="Task 1",
                 expected_output="Output 1",
-                agent=Agent(role="Agent 1", goal="Goal 1", backstory="Backstory 1"),
+                agent=Agent(role="Agent 1", desire="Goal 1", backstory="Backstory 1"),
             )
         ]
         planning_agent_llm = "gpt-3.5-turbo"
@@ -78,7 +78,7 @@ class InternalCrewPlanner:
     def test_create_planner_task(self, crew_planner):
         planning_agent = Agent(
             role="Planning Agent",
-            goal="Plan Step by Step Plan",
+            desire="Plan Step by Step Plan",
             backstory="Master in Planning",
         )
         tasks_summary = "Summary of tasks"
@@ -100,7 +100,7 @@ class InternalCrewPlanner:
         # Knowledge field should not be present when empty
         assert '"agent_knowledge"' not in tasks_summary
 
-    @patch('crewai.knowledge.storage.knowledge_storage.chromadb')
+    @patch("crewai.knowledge.storage.knowledge_storage.chromadb")
     def test_create_tasks_summary_with_knowledge_and_tools(self, mock_chroma):
         """Test task summary generation with both knowledge and tools present."""
         # Mock ChromaDB collection
@@ -141,13 +141,13 @@ class InternalCrewPlanner:
             expected_output="Expected output",
             agent=Agent(
                 role="Test Agent",
-                goal="Test Goal",
+                desire="Test Goal",
                 backstory="Test Backstory",
                 tools=[tool1, tool2],
                 knowledge_sources=[
                     StringKnowledgeSource(content="Test knowledge content")
-                ]
-            )
+                ],
+            ),
         )
 
         # Create planner with the new task
@@ -161,7 +161,7 @@ class InternalCrewPlanner:
         assert '"agent_tools": [tool1, tool2]' in tasks_summary
         assert '"agent_knowledge": "[\\"Test knowledge content\\"]"' in tasks_summary
         assert task.agent.role in tasks_summary
-        assert task.agent.goal in tasks_summary
+        assert task.agent.desire in tasks_summary
 
     def test_handle_crew_planning_different_llm(self, crew_planner_different_llm):
         with patch.object(Task, "execute_sync") as execute:

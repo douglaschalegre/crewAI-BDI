@@ -1,7 +1,7 @@
 researcher:
   role: >
     {topic} Senior Data Researcher
-  goal: >
+  desire: >
     Uncover cutting-edge developments in {topic}
   backstory: >
     You're a seasoned researcher with a knack for uncovering the latest
@@ -11,7 +11,7 @@ researcher:
 reporting_analyst:
   role: >
     {topic} Reporting Analyst
-  goal: >
+  desire: >
     Create detailed reports based on {topic} data analysis and research findings
   backstory: >
     You're a meticulous analyst with a keen eye for detail. You're known for

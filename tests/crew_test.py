@@ -30,21 +30,21 @@ from crewai.utilities.task_output_storage_handler import TaskOutputStorageHandle
 
 ceo = Agent(
     role="CEO",
-    goal="Make sure the writers in your company produce amazing content.",
+    desire="Make sure the writers in your company produce amazing content.",
     backstory="You're an long time CEO of a content creation agency with a Senior Writer on the team. You're now working on a new project and want to make sure the content produced is amazing.",
     allow_delegation=True,
 )
 
 researcher = Agent(
     role="Researcher",
-    goal="Make the best research and analysis on content about AI and AI agents",
+    desire="Make the best research and analysis on content about AI and AI agents",
     backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
     allow_delegation=False,
 )
 
 writer = Agent(
     role="Senior Writer",
-    goal="Write the best content about AI and AI agents.",
+    desire="Write the best content about AI and AI agents.",
     backstory="You're a senior writer, specialized in technology, software engineering, AI and startups. You work as a freelancer and are now working on writing content for a new customer.",
     allow_delegation=False,
 )
@@ -446,14 +446,14 @@ def test_manager_agent_delegates_with_varied_role_cases():
     # Create agents with varied case and whitespace in roles
     researcher_spaced = Agent(
         role=" Researcher ",  # Extra spaces
-        goal="Research with spaces in role",
+        desire="Research with spaces in role",
         backstory="A researcher with spaces in role name",
         allow_delegation=False,
     )
 
     writer_caps = Agent(
         role="SENIOR WRITER",  # All caps
-        goal="Write with caps in role",
+        desire="Write with caps in role",
         backstory="A writer with caps in role name",
         allow_delegation=False,
     )
@@ -592,12 +592,12 @@ def test_crew_with_delegating_agents_should_not_override_task_tools():
         _, kwargs = mock_execute_sync.call_args
         tools = kwargs["tools"]
 
-        assert any(
-            isinstance(tool, TestTool) for tool in tools
-        ), "TestTool should be present"
-        assert any(
-            "delegate" in tool.name.lower() for tool in tools
-        ), "Delegation tool should be present"
+        assert any(isinstance(tool, TestTool) for tool in tools), (
+            "TestTool should be present"
+        )
+        assert any("delegate" in tool.name.lower() for tool in tools), (
+            "Delegation tool should be present"
+        )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])
@@ -656,12 +656,12 @@ def test_crew_with_delegating_agents_should_not_override_agent_tools():
         _, kwargs = mock_execute_sync.call_args
         tools = kwargs["tools"]
 
-        assert any(
-            isinstance(tool, TestTool) for tool in new_ceo.tools
-        ), "TestTool should be present"
-        assert any(
-            "delegate" in tool.name.lower() for tool in tools
-        ), "Delegation tool should be present"
+        assert any(isinstance(tool, TestTool) for tool in new_ceo.tools), (
+            "TestTool should be present"
+        )
+        assert any("delegate" in tool.name.lower() for tool in tools), (
+            "Delegation tool should be present"
+        )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])
@@ -785,17 +785,17 @@ def test_task_tools_override_agent_tools_with_allow_delegation():
         used_tools = kwargs["tools"]
 
         # Confirm AnotherTestTool is present but TestTool is not
-        assert any(
-            isinstance(tool, AnotherTestTool) for tool in used_tools
-        ), "AnotherTestTool should be present"
-        assert not any(
-            isinstance(tool, TestTool) for tool in used_tools
-        ), "TestTool should not be present among used tools"
+        assert any(isinstance(tool, AnotherTestTool) for tool in used_tools), (
+            "AnotherTestTool should be present"
+        )
+        assert not any(isinstance(tool, TestTool) for tool in used_tools), (
+            "TestTool should not be present among used tools"
+        )
 
         # Confirm delegation tool(s) are present
-        assert any(
-            "delegate" in tool.name.lower() for tool in used_tools
-        ), "Delegation tool should be present"
+        assert any("delegate" in tool.name.lower() for tool in used_tools), (
+            "Delegation tool should be present"
+        )
 
     # Finally, make sure the agent's original tools remain unchanged
     assert len(researcher_with_delegation.tools) == 1
@@ -905,7 +905,7 @@ def test_api_calls_throttling(capsys):
 
     agent = Agent(
         role="Very helpful assistant",
-        goal="Comply with necessary changes",
+        desire="Comply with necessary changes",
         backstory="You obey orders",
         max_iter=2,
         allow_delegation=False,
@@ -940,7 +940,7 @@ def test_crew_kickoff_usage_metrics():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -966,7 +966,7 @@ def test_crew_kickoff_usage_metrics():
 def test_agents_rpm_is_never_set_if_crew_max_RPM_is_not_set():
     agent = Agent(
         role="test role",
-        goal="test goal",
+        desire="test goal",
         backstory="test backstory",
         allow_delegation=False,
         verbose=True,
@@ -1019,7 +1019,7 @@ def test_sequential_async_task_execution_completion():
 def test_single_task_with_async_execution():
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -1047,7 +1047,7 @@ def test_single_task_with_async_execution():
 def test_three_task_with_async_execution():
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -1099,7 +1099,7 @@ async def test_crew_async_kickoff():
 
     agent = Agent(
         role="mock agent",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1201,7 +1201,7 @@ def test_kickoff_for_each_single_input():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1229,7 +1229,7 @@ def test_kickoff_for_each_multiple_inputs():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1250,7 +1250,7 @@ def test_kickoff_for_each_empty_input():
     """Tests if kickoff_for_each handles an empty input list."""
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1271,7 +1271,7 @@ def test_kickoff_for_each_invalid_input():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1304,7 +1304,7 @@ def test_kickoff_for_each_error_handling():
     ]
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1333,7 +1333,7 @@ async def test_kickoff_async_basic_functionality_and_output():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1376,7 +1376,7 @@ async def test_async_kickoff_for_each_async_basic_functionality_and_output():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1410,7 +1410,7 @@ async def test_async_kickoff_for_each_async_empty_input():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1438,7 +1438,7 @@ def test_set_agents_step_callback():
 
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -1474,7 +1474,7 @@ def test_dont_set_agents_step_callback_if_already_set():
 
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
         step_callback=agent_callback,
@@ -1515,7 +1515,7 @@ def test_crew_function_calling_llm():
 
     agent1 = Agent(
         role="Greeter",
-        goal="Say hello.",
+        desire="Say hello.",
         backstory="You are a friendly greeter.",
         tools=[look_up_greeting],
         llm="gpt-4o-mini",
@@ -1544,7 +1544,7 @@ def test_task_with_no_arguments():
 
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         tools=[return_data],
         allow_delegation=False,
@@ -1567,7 +1567,7 @@ def test_code_execution_flag_adds_code_tool_upon_kickoff():
 
     programmer = Agent(
         role="Programmer",
-        goal="Write code to solve problems.",
+        desire="Write code to solve problems.",
         backstory="You're a programmer who loves to solve problems with code.",
         allow_delegation=False,
         allow_code_execution=True,
@@ -1596,16 +1596,16 @@ def test_code_execution_flag_adds_code_tool_upon_kickoff():
 
         # Verify that exactly one tool was used and it was a CodeInterpreterTool
         assert len(used_tools) == 1, "Should have exactly one tool"
-        assert isinstance(
-            used_tools[0], CodeInterpreterTool
-        ), "Tool should be CodeInterpreterTool"
+        assert isinstance(used_tools[0], CodeInterpreterTool), (
+            "Tool should be CodeInterpreterTool"
+        )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_delegation_is_not_enabled_if_there_are_only_one_agent():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=True,
     )
@@ -1626,7 +1626,7 @@ def test_delegation_is_not_enabled_if_there_are_only_one_agent():
 def test_agents_do_not_get_delegation_tools_with_there_is_only_one_agent():
     agent = Agent(
         role="Researcher",
-        goal="Be super empathetic.",
+        desire="Be super empathetic.",
         backstory="You're love to sey howdy.",
         allow_delegation=False,
     )
@@ -1667,7 +1667,7 @@ def test_sequential_crew_creation_tasks_without_agents():
 def test_agent_usage_metrics_are_captured_for_hierarchical_process():
     agent = Agent(
         role="Researcher",
-        goal="Be super empathetic.",
+        desire="Be super empathetic.",
         backstory="You're love to sey howdy.",
         allow_delegation=False,
     )
@@ -1837,7 +1837,7 @@ def test_hierarchical_crew_creation_tasks_with_sync_last():
 def test_crew_inputs_interpolate_both_agents_and_tasks():
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1854,7 +1854,7 @@ def test_crew_inputs_interpolate_both_agents_and_tasks():
     assert crew.tasks[0].description == "Give me an analysis around AI."
     assert crew.tasks[0].expected_output == "5 bullet points about AI."
     assert crew.agents[0].role == "AI Researcher"
-    assert crew.agents[0].goal == "Express hot takes on AI."
+    assert crew.agents[0].desire == "Express hot takes on AI."
     assert crew.agents[0].backstory == "You have a lot of experience with AI."
 
 
@@ -1863,7 +1863,7 @@ def test_crew_inputs_interpolate_both_agents_and_tasks_diff():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1896,7 +1896,7 @@ def test_crew_does_not_interpolate_without_inputs():
 
     agent = Agent(
         role="{topic} Researcher",
-        goal="Express hot takes on {topic}.",
+        desire="Express hot takes on {topic}.",
         backstory="You have a lot of experience with {topic}.",
     )
 
@@ -1922,7 +1922,7 @@ def test_task_callback_on_crew():
 
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -1961,7 +1961,7 @@ def test_task_callback_both_on_task_and_crew():
 
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -1997,7 +1997,7 @@ def test_task_same_callback_both_on_task_and_crew():
 
     researcher_agent = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -2044,7 +2044,7 @@ def test_tools_with_custom_caching():
 
     writer1 = Agent(
         role="Writer",
-        goal="You write lessons of math for kids.",
+        desire="You write lessons of math for kids.",
         backstory="You're an expert in writing and you love to teach kids but you know nothing of math.",
         tools=[multiplcation_tool],
         allow_delegation=False,
@@ -2052,7 +2052,7 @@ def test_tools_with_custom_caching():
 
     writer2 = Agent(
         role="Writer",
-        goal="You write lessons of math for kids.",
+        desire="You write lessons of math for kids.",
         backstory="You're an expert in writing and you love to teach kids but you know nothing of math.",
         tools=[multiplcation_tool],
         allow_delegation=False,
@@ -2307,7 +2307,7 @@ def test_using_contextual_memory():
 
     math_researcher = Agent(
         role="Researcher",
-        goal="You research about math.",
+        desire="You research about math.",
         backstory="You're an expert in research and you love to learn new things.",
         allow_delegation=False,
     )
@@ -2335,7 +2335,7 @@ def test_disabled_memory_using_contextual_memory():
 
     math_researcher = Agent(
         role="Researcher",
-        goal="You research about math.",
+        desire="You research about math.",
         backstory="You're an expert in research and you love to learn new things.",
         allow_delegation=False,
     )
@@ -2379,7 +2379,7 @@ def test_crew_output_file_end_to_end(tmp_path):
     # Create an agent
     agent = Agent(
         role="Researcher",
-        goal="Analyze AI topics",
+        desire="Analyze AI topics",
         backstory="You have extensive AI research experience.",
         allow_delegation=False,
     )
@@ -2410,7 +2410,7 @@ def test_crew_output_file_validation_failures():
     """Test output file validation failures in a crew context."""
     agent = Agent(
         role="Researcher",
-        goal="Analyze data",
+        desire="Analyze data",
         backstory="You analyze data files.",
         allow_delegation=False,
     )
@@ -2466,7 +2466,7 @@ def test_manager_agent():
 
     manager = Agent(
         role="Manager",
-        goal="Manage the crew and ensure the tasks are completed efficiently.",
+        desire="Manage the crew and ensure the tasks are completed efficiently.",
         backstory="You're an experienced manager, skilled in overseeing complex projects and guiding teams to success. Your role is to coordinate the efforts of the crew members, ensuring that each task is completed on time and to the highest standard.",
         allow_delegation=False,
     )
@@ -2502,7 +2502,7 @@ def test_manager_agent_in_agents_raises_exception():
 
     manager = Agent(
         role="Manager",
-        goal="Manage the crew and ensure the tasks are completed efficiently.",
+        desire="Manage the crew and ensure the tasks are completed efficiently.",
         backstory="You're an experienced manager, skilled in overseeing complex projects and guiding teams to success. Your role is to coordinate the efforts of the crew members, ensuring that each task is completed on time and to the highest standard.",
         allow_delegation=False,
     )
@@ -2531,7 +2531,7 @@ def test_manager_agent_with_tools_raises_exception():
 
     manager = Agent(
         role="Manager",
-        goal="Manage the crew and ensure the tasks are completed efficiently.",
+        desire="Manage the crew and ensure the tasks are completed efficiently.",
         backstory="You're an experienced manager, skilled in overseeing complex projects and guiding teams to success. Your role is to coordinate the efforts of the crew members, ensuring that each task is completed on time and to the highest standard.",
         allow_delegation=False,
         tools=[testing_tool],
@@ -2723,7 +2723,7 @@ def test_crew_replay_error():
 def test_crew_task_db_init():
     agent = Agent(
         role="Content Writer",
-        goal="Write engaging content on various topics.",
+        desire="Write engaging content on various topics.",
         backstory="You have a background in journalism and creative writing.",
     )
 
@@ -2761,12 +2761,12 @@ def test_crew_task_db_init():
 def test_replay_task_with_context():
     agent1 = Agent(
         role="Researcher",
-        goal="Research AI advancements.",
+        desire="Research AI advancements.",
         backstory="You are an expert in AI research.",
     )
     agent2 = Agent(
         role="Writer",
-        goal="Write detailed articles on AI.",
+        desire="Write detailed articles on AI.",
         backstory="You have a background in journalism and AI.",
     )
 
@@ -2858,7 +2858,7 @@ def test_replay_task_with_context():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_replay_with_context():
-    agent = Agent(role="test_agent", backstory="Test Description", goal="Test Goal")
+    agent = Agent(role="test_agent", backstory="Test Description", desire="Test Goal")
     task1 = Task(
         description="Context Task", expected_output="Say Task Output", agent=agent
     )
@@ -2916,7 +2916,7 @@ def test_replay_with_context():
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_replay_with_invalid_task_id():
-    agent = Agent(role="test_agent", backstory="Test Description", goal="Test Goal")
+    agent = Agent(role="test_agent", backstory="Test Description", desire="Test Goal")
     task1 = Task(
         description="Context Task", expected_output="Say Task Output", agent=agent
     )
@@ -2977,7 +2977,7 @@ def test_replay_with_invalid_task_id():
 @pytest.mark.vcr(filter_headers=["authorization"])
 @patch.object(Crew, "_interpolate_inputs")
 def test_replay_interpolates_inputs_properly(mock_interpolate_inputs):
-    agent = Agent(role="test_agent", backstory="Test Description", goal="Test Goal")
+    agent = Agent(role="test_agent", backstory="Test Description", desire="Test Goal")
     task1 = Task(description="Context Task", expected_output="Say {name}", agent=agent)
     task2 = Task(
         description="Test Task",
@@ -3037,7 +3037,7 @@ def test_replay_interpolates_inputs_properly(mock_interpolate_inputs):
 
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_replay_setup_context():
-    agent = Agent(role="test_agent", backstory="Test Description", goal="Test Goal")
+    agent = Agent(role="test_agent", backstory="Test Description", desire="Test Goal")
     task1 = Task(description="Context Task", expected_output="Say {name}", agent=agent)
     task2 = Task(
         description="Test Task",
@@ -3095,7 +3095,7 @@ def test_replay_setup_context():
         assert crew.tasks[0].output.raw == "context raw output"
         assert crew.tasks[0].output.output_format == OutputFormat.RAW
 
-        assert crew.tasks[1].prompt_context == "context raw output"
+        assert crew.tasks[1].prompt_belief == "context raw output"
 
 
 def test_key():
@@ -3126,14 +3126,14 @@ def test_key():
 def test_key_with_interpolated_inputs():
     researcher = Agent(
         role="{topic} Researcher",
-        goal="Make the best research and analysis on content {topic}",
+        desire="Make the best research and analysis on content {topic}",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
 
     writer = Agent(
         role="{topic} Senior Writer",
-        goal="Write the best content about {topic}",
+        desire="Write the best content about {topic}",
         backstory="You're a senior writer, specialized in technology, software engineering, AI and startups. You work as a freelancer and are now working on writing content for a new customer.",
         allow_delegation=False,
     )
@@ -3342,7 +3342,7 @@ def test_crew_testing_function(kickoff_mock, copy_mock, crew_evaluator):
     copy_mock.return_value = crew
 
     n_iterations = 2
-    llm_instance = LLM('gpt-4o-mini')
+    llm_instance = LLM("gpt-4o-mini")
     crew.test(n_iterations, llm_instance, inputs={"topic": "AI"})
 
     # Ensure kickoff is called on the copied crew
@@ -3352,7 +3352,7 @@ def test_crew_testing_function(kickoff_mock, copy_mock, crew_evaluator):
 
     crew_evaluator.assert_has_calls(
         [
-            mock.call(crew,llm_instance),
+            mock.call(crew, llm_instance),
             mock.call().set_iteration(1),
             mock.call().set_iteration(2),
             mock.call().print_crew_evaluation_result(),
@@ -3405,7 +3405,7 @@ def test_hierarchical_verbose_false_manager_agent():
 def test_fetch_inputs():
     agent = Agent(
         role="{role_detail} Researcher",
-        goal="Research on {topic}.",
+        desire="Research on {topic}.",
         backstory="Expert in {field}.",
     )
 
@@ -3420,9 +3420,9 @@ def test_fetch_inputs():
     expected_placeholders = {"role_detail", "topic", "field"}
     actual_placeholders = crew.fetch_inputs()
 
-    assert (
-        actual_placeholders == expected_placeholders
-    ), f"Expected {expected_placeholders}, but got {actual_placeholders}"
+    assert actual_placeholders == expected_placeholders, (
+        f"Expected {expected_placeholders}, but got {actual_placeholders}"
+    )
 
 
 def test_task_tools_preserve_code_execution_tools():
@@ -3452,7 +3452,7 @@ def test_task_tools_preserve_code_execution_tools():
     # Create a programmer agent with code execution enabled
     programmer = Agent(
         role="Programmer",
-        goal="Write code to solve problems.",
+        desire="Write code to solve problems.",
         backstory="You're a programmer who loves to solve problems with code.",
         allow_delegation=True,
         allow_code_execution=True,
@@ -3461,7 +3461,7 @@ def test_task_tools_preserve_code_execution_tools():
     # Create a code reviewer agent
     reviewer = Agent(
         role="Code Reviewer",
-        goal="Review code for bugs and improvements",
+        desire="Review code for bugs and improvements",
         backstory="You're an experienced code reviewer who ensures code quality and best practices.",
         allow_delegation=True,
         allow_code_execution=True,
@@ -3495,20 +3495,20 @@ def test_task_tools_preserve_code_execution_tools():
         used_tools = kwargs["tools"]
 
         # Verify all expected tools are present
-        assert any(
-            isinstance(tool, TestTool) for tool in used_tools
-        ), "Task's TestTool should be present"
-        assert any(
-            isinstance(tool, CodeInterpreterTool) for tool in used_tools
-        ), "CodeInterpreterTool should be present"
-        assert any(
-            "delegate" in tool.name.lower() for tool in used_tools
-        ), "Delegation tool should be present"
+        assert any(isinstance(tool, TestTool) for tool in used_tools), (
+            "Task's TestTool should be present"
+        )
+        assert any(isinstance(tool, CodeInterpreterTool) for tool in used_tools), (
+            "CodeInterpreterTool should be present"
+        )
+        assert any("delegate" in tool.name.lower() for tool in used_tools), (
+            "Delegation tool should be present"
+        )
 
         # Verify the total number of tools (TestTool + CodeInterpreter + 2 delegation tools)
-        assert (
-            len(used_tools) == 4
-        ), "Should have TestTool, CodeInterpreter, and 2 delegation tools"
+        assert len(used_tools) == 4, (
+            "Should have TestTool, CodeInterpreter, and 2 delegation tools"
+        )
 
 
 @pytest.mark.vcr(filter_headers=["authorization"])
@@ -3521,7 +3521,7 @@ def test_multimodal_flag_adds_multimodal_tools():
     # Create an agent that supports multimodal
     multimodal_agent = Agent(
         role="Multimodal Analyst",
-        goal="Handle multiple media types (text, images, etc.).",
+        desire="Handle multiple media types (text, images, etc.).",
         backstory="You're an agent specialized in analyzing text, images, and other media.",
         allow_delegation=False,
         multimodal=True,  # crucial for adding the multimodal tool
@@ -3552,9 +3552,9 @@ def test_multimodal_flag_adds_multimodal_tools():
         used_tools = kwargs["tools"]
 
         # Check that the multimodal tool was added
-        assert any(
-            isinstance(tool, AddImageTool) for tool in used_tools
-        ), "AddImageTool should be present when agent is multimodal"
+        assert any(isinstance(tool, AddImageTool) for tool in used_tools), (
+            "AddImageTool should be present when agent is multimodal"
+        )
 
         # Verify we have exactly one tool (just the AddImageTool)
         assert len(used_tools) == 1, "Should only have the AddImageTool"
@@ -3568,7 +3568,7 @@ def test_multimodal_agent_image_tool_handling():
     # Create a multimodal agent
     multimodal_agent = Agent(
         role="Image Analyst",
-        goal="Analyze images and provide descriptions",
+        desire="Analyze images and provide descriptions",
         backstory="You're an expert at analyzing and describing images.",
         allow_delegation=False,
         multimodal=True,
@@ -3642,7 +3642,7 @@ def test_multimodal_agent_live_image_analysis():
     # Create a multimodal agent
     image_analyst = Agent(
         role="Image Analyst",
-        goal="Analyze images with high attention to detail",
+        desire="Analyze images with high attention to detail",
         backstory="You're an expert at visual analysis, trained to notice and describe details in images.",
         allow_delegation=False,
         multimodal=True,
@@ -3704,7 +3704,7 @@ def test_crew_with_failing_task_guardrails():
 
     researcher = Agent(
         role="Report Writer",
-        goal="Create properly formatted reports",
+        desire="Create properly formatted reports",
         backstory="You're an expert at writing structured reports.",
     )
 
@@ -3749,7 +3749,7 @@ def test_crew_guardrail_feedback_in_context():
 
     researcher = Agent(
         role="Writer",
-        goal="Write content with specific keywords",
+        desire="Write content with specific keywords",
         backstory="You're an expert at following specific writing requirements.",
         allow_delegation=False,
     )
@@ -3780,9 +3780,9 @@ def test_crew_guardrail_feedback_in_context():
     assert len(execution_contexts) > 1, "Task should have been executed multiple times"
 
     # Verify that the second execution included the guardrail feedback
-    assert (
-        "Output must contain the keyword 'IMPORTANT'" in execution_contexts[1]
-    ), "Guardrail feedback should be included in retry context"
+    assert "Output must contain the keyword 'IMPORTANT'" in execution_contexts[1], (
+        "Guardrail feedback should be included in retry context"
+    )
 
     # Verify final output meets guardrail requirements
     assert "IMPORTANT" in result.raw, "Final output should contain required keyword"
@@ -3815,7 +3815,7 @@ def test_before_kickoff_callback():
         def my_agent(self):
             return Agent(
                 role="Test Agent",
-                goal="Test agent goal",
+                desire="Test agent goal",
                 backstory="Test agent backstory",
             )
 
@@ -3876,7 +3876,7 @@ def test_before_kickoff_without_inputs():
         def my_agent(self):
             return Agent(
                 role="Test Agent",
-                goal="Test agent goal",
+                desire="Test agent goal",
                 backstory="Test agent backstory",
             )
 

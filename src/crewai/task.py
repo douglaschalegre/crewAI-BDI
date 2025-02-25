@@ -54,7 +54,7 @@ class Task(BaseModel):
         async_execution: Boolean flag indicating asynchronous task execution.
         callback: Function/object executed post task completion for additional actions.
         config: Dictionary containing task-specific configuration parameters.
-        context: List of Task instances providing task context or input data.
+        belief: List of Task instances providing task belief or input data.
         description: Descriptive text detailing task's purpose and execution.
         expected_output: Clear definition of expected task outcome.
         output_file: File path for storing task output.
@@ -70,7 +70,7 @@ class Task(BaseModel):
     delegations: int = 0
     i18n: I18N = I18N()
     name: Optional[str] = Field(default=None)
-    prompt_context: Optional[str] = None
+    prompt_belief: Optional[str] = None
     description: str = Field(description="Description of the actual task.")
     expected_output: str = Field(
         description="Clear definition of expected output for the task."
@@ -85,8 +85,8 @@ class Task(BaseModel):
     agent: Optional[BaseAgent] = Field(
         description="Agent responsible for execution the task.", default=None
     )
-    context: Optional[List["Task"]] = Field(
-        description="Other tasks that will have their output used as context for this task.",
+    belief: Optional[List["Task"]] = Field(
+        description="Other tasks that will have their output used as belief for this task.",
         default=None,
     )
     async_execution: Optional[bool] = Field(
@@ -295,11 +295,11 @@ class Task(BaseModel):
     def execute_sync(
         self,
         agent: Optional[BaseAgent] = None,
-        context: Optional[str] = None,
+        belief: Optional[str] = None,
         tools: Optional[List[BaseTool]] = None,
     ) -> TaskOutput:
         """Execute the task synchronously."""
-        return self._execute_core(agent, context, tools)
+        return self._execute_core(agent, belief, tools)
 
     @property
     def key(self) -> str:
@@ -318,7 +318,7 @@ class Task(BaseModel):
     def execute_async(
         self,
         agent: BaseAgent | None = None,
-        context: Optional[str] = None,
+        belief: Optional[str] = None,
         tools: Optional[List[BaseTool]] = None,
     ) -> Future[TaskOutput]:
         """Execute the task asynchronously."""
@@ -326,25 +326,25 @@ class Task(BaseModel):
         threading.Thread(
             daemon=True,
             target=self._execute_task_async,
-            args=(agent, context, tools, future),
+            args=(agent, belief, tools, future),
         ).start()
         return future
 
     def _execute_task_async(
         self,
         agent: Optional[BaseAgent],
-        context: Optional[str],
+        belief: Optional[str],
         tools: Optional[List[Any]],
         future: Future[TaskOutput],
     ) -> None:
-        """Execute the task asynchronously with context handling."""
-        result = self._execute_core(agent, context, tools)
+        """Execute the task asynchronously with belief handling."""
+        result = self._execute_core(agent, belief, tools)
         future.set_result(result)
 
     def _execute_core(
         self,
         agent: Optional[BaseAgent],
-        context: Optional[str],
+        belief: Optional[str],
         tools: Optional[List[Any]],
     ) -> TaskOutput:
         """Run the core execution logic of the task."""
@@ -358,14 +358,14 @@ class Task(BaseModel):
         self.start_time = datetime.datetime.now()
         self._execution_span = self._telemetry.task_started(crew=agent.crew, task=self)
 
-        self.prompt_context = context
+        self.prompt_belief = belief
         tools = tools or self.tools or []
 
         self.processed_by_agents.add(agent.role)
 
         result = agent.execute_task(
             task=self,
-            context=context,
+            belief=belief,
             tools=tools,
         )
 
@@ -391,7 +391,7 @@ class Task(BaseModel):
                     )
 
                 self.retry_count += 1
-                context = self.i18n.errors("validation_error").format(
+                belief = self.i18n.errors("validation_error").format(
                     guardrail_result_error=guardrail_result.error,
                     task_output=task_output.raw,
                 )
@@ -400,7 +400,7 @@ class Task(BaseModel):
                     content=f"Guardrail blocked, retrying, due to: {guardrail_result.error}\n",
                     color="yellow",
                 )
-                return self._execute_core(agent, context, tools)
+                return self._execute_core(agent, belief, tools)
 
             if guardrail_result.result is None:
                 raise Exception(
@@ -612,16 +612,16 @@ class Task(BaseModel):
         exclude = {
             "id",
             "agent",
-            "context",
+            "belief",
             "tools",
         }
 
         copied_data = self.model_dump(exclude=exclude)
         copied_data = {k: v for k, v in copied_data.items() if v is not None}
 
-        cloned_context = (
-            [task_mapping[context_task.key] for context_task in self.context]
-            if self.context
+        cloned_belief = (
+            [task_mapping[belief_task.key] for belief_task in self.belief]
+            if self.belief
             else None
         )
 
@@ -633,7 +633,7 @@ class Task(BaseModel):
 
         copied_task = Task(
             **copied_data,
-            context=cloned_context,
+            belief=cloned_belief,
             agent=cloned_agent,
             tools=cloned_tools,
         )
@@ -716,10 +716,9 @@ class Task(BaseModel):
                     file.write(str(result))
         except (OSError, IOError) as e:
             raise RuntimeError(
-                "\n".join([
-                    f"Failed to save output file: {e}",
-                    FILEWRITER_RECOMMENDATION
-                ])
+                "\n".join(
+                    [f"Failed to save output file: {e}", FILEWRITER_RECOMMENDATION]
+                )
             )
         return None
 

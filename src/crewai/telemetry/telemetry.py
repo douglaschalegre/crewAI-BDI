@@ -37,7 +37,7 @@ class Telemetry:
     The data being collected is for development purpose, all data is anonymous.
 
     There is NO data being collected on the prompts, tasks descriptions
-    agents backstories or goals nor responses or any data that is being
+    agents backstories or desires nor responses or any data that is being
     processed by the agents, nor any secrets and env vars.
 
     Users can opt-in to sharing more complete data using the `share_crew`
@@ -122,7 +122,7 @@ class Telemetry:
                                 "key": agent.key,
                                 "id": str(agent.id),
                                 "role": agent.role,
-                                "goal": agent.goal,
+                                "desire": agent.desire,
                                 "backstory": agent.backstory,
                                 "verbose?": agent.verbose,
                                 "max_iter": agent.max_iter,
@@ -487,7 +487,7 @@ class Telemetry:
                             "key": agent.key,
                             "id": str(agent.id),
                             "role": agent.role,
-                            "goal": agent.goal,
+                            "desire": agent.desire,
                             "backstory": agent.backstory,
                             "verbose?": agent.verbose,
                             "max_iter": agent.max_iter,

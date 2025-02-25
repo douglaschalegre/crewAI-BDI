@@ -24,7 +24,7 @@ def test_task_tool_reflect_agent_tools():
 
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         tools=[fake_tool],
         allow_delegation=False,
@@ -52,7 +52,7 @@ def test_task_tool_takes_precedence_over_agent_tools():
 
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         tools=[fake_tool],
         allow_delegation=False,
@@ -71,7 +71,7 @@ def test_task_tool_takes_precedence_over_agent_tools():
 def test_task_prompt_includes_expected_output():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -91,7 +91,7 @@ def test_task_prompt_includes_expected_output():
 def test_task_callback():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -121,7 +121,7 @@ def test_task_callback_returns_task_output():
 
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -165,7 +165,7 @@ def test_task_callback_returns_task_output():
 def test_execute_with_agent():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -183,7 +183,7 @@ def test_execute_with_agent():
 def test_async_execution():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )
@@ -222,7 +222,7 @@ def test_output_pydantic_sequential():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -247,7 +247,7 @@ def test_output_pydantic_hierarchical():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -277,7 +277,7 @@ def test_output_json_sequential():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -303,7 +303,7 @@ def test_output_json_hierarchical():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -333,7 +333,7 @@ def test_json_property_without_output_json():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -361,7 +361,7 @@ def test_output_json_dict_sequential():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -386,7 +386,7 @@ def test_output_json_dict_hierarchical():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -416,7 +416,7 @@ def test_output_pydantic_to_another_task():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
         llm="gpt-4-0125-preview",
@@ -441,9 +441,9 @@ def test_output_pydantic_to_another_task():
     crew = Crew(agents=[scorer], tasks=[task1, task2], verbose=True)
     result = crew.kickoff()
     pydantic_result = result.pydantic
-    assert isinstance(
-        pydantic_result, ScoreOutput
-    ), "Expected pydantic result to be of type ScoreOutput"
+    assert isinstance(pydantic_result, ScoreOutput), (
+        "Expected pydantic result to be of type ScoreOutput"
+    )
     assert pydantic_result.score == 5
 
 
@@ -454,7 +454,7 @@ def test_output_json_to_another_task():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -482,7 +482,7 @@ def test_output_json_to_another_task():
 def test_save_task_output():
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -509,7 +509,7 @@ def test_save_task_json_output():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -539,7 +539,7 @@ def test_save_task_pydantic_output():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -572,7 +572,7 @@ def test_custom_converter_cls():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -598,7 +598,7 @@ def test_custom_converter_cls():
 def test_increment_delegations_for_hierarchical_process():
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=False,
     )
@@ -625,14 +625,14 @@ def test_increment_delegations_for_hierarchical_process():
 def test_increment_delegations_for_sequential_process():
     manager = Agent(
         role="Manager",
-        goal="Coordinate scoring processes",
+        desire="Coordinate scoring processes",
         backstory="You're great at delegating work about scoring.",
         allow_delegation=True,
     )
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         allow_delegation=True,
     )
@@ -666,7 +666,7 @@ def test_increment_tool_errors():
 
     scorer = Agent(
         role="Scorer",
-        goal="Score the title",
+        desire="Score the title",
         backstory="You're an expert scorer, specialized in scoring titles.",
         tools=[scoring_examples],
     )
@@ -907,9 +907,9 @@ def test_key():
     assert task.key == hash, "The key should be the hash of the description."
 
     task.interpolate_inputs_and_add_conversation_history(inputs={"topic": "AI"})
-    assert (
-        task.key == hash
-    ), "The key should be the hash of the non-interpolated description."
+    assert task.key == hash, (
+        "The key should be the hash of the non-interpolated description."
+    )
 
 
 def test_output_file_validation():
@@ -983,7 +983,7 @@ def test_output_file_validation():
 def test_task_execution_times():
     researcher = Agent(
         role="Researcher",
-        goal="Make the best research and analysis on content about AI and AI agents",
+        desire="Make the best research and analysis on content about AI and AI agents",
         backstory="You're an expert researcher, specialized in technology, software engineering, AI and startups. You work as a freelancer and is now working on doing research and analysis for a new customer.",
         allow_delegation=False,
     )

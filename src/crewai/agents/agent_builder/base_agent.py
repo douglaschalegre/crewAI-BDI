@@ -35,7 +35,7 @@ class BaseAgent(ABC, BaseModel):
     Attributes:
         id (UUID4): Unique identifier for the agent.
         role (str): Role of the agent.
-        goal (str): Objective of the agent.
+        desire (str): Desire of the agent.
         backstory (str): Backstory of the agent.
         cache (bool): Whether the agent should use a cache for tool usage.
         config (Optional[Dict[str, Any]]): Configuration for the agent.
@@ -56,7 +56,7 @@ class BaseAgent(ABC, BaseModel):
 
 
     Methods:
-        execute_task(task: Any, context: Optional[str] = None, tools: Optional[List[BaseTool]] = None) -> str:
+        execute_task(task: Any, belief: Optional[str] = None, tools: Optional[List[BaseTool]] = None) -> str:
             Abstract method to execute a task.
         create_agent_executor(tools=None) -> None:
             Abstract method to create an agent executor.
@@ -85,7 +85,7 @@ class BaseAgent(ABC, BaseModel):
     _rpm_controller: Optional[RPMController] = PrivateAttr(default=None)
     _request_within_rpm_limit: Any = PrivateAttr(default=None)
     _original_role: Optional[str] = PrivateAttr(default=None)
-    _original_goal: Optional[str] = PrivateAttr(default=None)
+    _original_desire: Optional[str] = PrivateAttr(default=None)
     _original_backstory: Optional[str] = PrivateAttr(default=None)
     _token_process: TokenProcess = PrivateAttr(default_factory=TokenProcess)
     id: UUID4 = Field(default_factory=uuid.uuid4, frozen=True)
@@ -93,7 +93,7 @@ class BaseAgent(ABC, BaseModel):
         default=0, description="Number of formatting errors."
     )
     role: str = Field(description="Role of the agent")
-    goal: str = Field(description="Objective of the agent")
+    desire: str = Field(description="Objective of the agent")
     backstory: str = Field(description="Backstory of the agent")
     config: Optional[Dict[str, Any]] = Field(
         description="Configuration for the agent", default=None, exclude=True
@@ -185,7 +185,7 @@ class BaseAgent(ABC, BaseModel):
     @model_validator(mode="after")
     def validate_and_set_attributes(self):
         # Validate required fields
-        for field in ["role", "goal", "backstory"]:
+        for field in ["role", "desire", "backstory"]:
             if getattr(self, field) is None:
                 raise ValueError(
                     f"{field} must be provided either directly or through config"
@@ -226,7 +226,7 @@ class BaseAgent(ABC, BaseModel):
     def key(self):
         source = [
             self._original_role or self.role,
-            self._original_goal or self.goal,
+            self._original_desire or self.desire,
             self._original_backstory or self.backstory,
         ]
         return md5("|".join(source).encode(), usedforsecurity=False).hexdigest()
@@ -235,7 +235,7 @@ class BaseAgent(ABC, BaseModel):
     def execute_task(
         self,
         task: Any,
-        context: Optional[str] = None,
+        belief: Optional[str] = None,
         tools: Optional[List[BaseTool]] = None,
     ) -> str:
         pass
@@ -318,14 +318,14 @@ class BaseAgent(ABC, BaseModel):
         """Interpolate inputs into the agent description and backstory."""
         if self._original_role is None:
             self._original_role = self.role
-        if self._original_goal is None:
-            self._original_goal = self.goal
+        if self._original_desire is None:
+            self._original_desire = self.desire
         if self._original_backstory is None:
             self._original_backstory = self.backstory
 
         if inputs:
             self.role = self._original_role.format(**inputs)
-            self.goal = self._original_goal.format(**inputs)
+            self.desire = self._original_desire.format(**inputs)
             self.backstory = self._original_backstory.format(**inputs)
 
     def set_cache_handler(self, cache_handler: CacheHandler) -> None:

@@ -1,12 +1,12 @@
 {
   "hierarchical_manager_agent": {
     "role": "Lorem ipsum dolor sit amet",
-    "goal": "Lorem ipsum dolor sit amet",
+    "desire": "Lorem ipsum dolor sit amet",
     "backstory": "Lorem ipsum dolor sit amet."
   },
   "planning_manager_agent": {
     "role": "Lorem ipsum dolor sit amet",
-    "goal": "Lorem ipsum dolor sit amet",
+    "desire": "Lorem ipsum dolor sit amet",
     "backstory": "Lorem ipsum dolor sit amet."
   },
   "slices": {
