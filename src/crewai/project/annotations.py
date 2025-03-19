@@ -40,6 +40,13 @@ def agent(func):
     return func
 
 
+def bdi_agent(func):
+    """Marks a method as a BDI agent."""
+    func.is_bdi_agent = True
+    func = memoize(func)
+    return func
+
+
 def llm(func):
     """Marks a method as an LLM provider."""
     func.is_llm = True
@@ -84,12 +91,13 @@ def crew(func) -> Callable[..., Crew]:
     def wrapper(self, *args, **kwargs) -> Crew:
         instantiated_tasks = []
         instantiated_agents = []
+        instantiated_bdi_agents = []
         agent_roles = set()
 
         # Use the preserved task and agent information
         tasks = self._original_tasks.items()
         agents = self._original_agents.items()
-
+        bdi_agents = self._original_bdi_agents.items()
         # Instantiate tasks in order
         for task_name, task_method in tasks:
             task_instance = task_method(self)
@@ -106,6 +114,13 @@ def crew(func) -> Callable[..., Crew]:
                 instantiated_agents.append(agent_instance)
                 agent_roles.add(agent_instance.role)
 
+        for bdi_agent_name, bdi_agent_method in bdi_agents:
+            bdi_agent_instance = bdi_agent_method(self)
+            if bdi_agent_instance.role not in agent_roles:
+                instantiated_bdi_agents.append(bdi_agent_instance)
+                agent_roles.add(bdi_agent_instance.role)
+
+        self.bdi_agents = instantiated_bdi_agents
         self.agents = instantiated_agents
         self.tasks = instantiated_tasks
 

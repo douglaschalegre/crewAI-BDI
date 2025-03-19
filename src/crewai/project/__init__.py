@@ -1,6 +1,7 @@
 from .annotations import (
     after_kickoff,
     agent,
+    bdi_agent,
     before_kickoff,
     cache_handler,
     callback,
@@ -26,4 +27,5 @@ __all__ = [
     "cache_handler",
     "before_kickoff",
     "after_kickoff",
+    "bdi_agent",
 ]

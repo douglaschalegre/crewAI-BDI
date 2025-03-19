@@ -28,6 +28,9 @@ def CrewBase(cls: T) -> T:
             cls, "agents_config", "config/agents.yaml"
         )
         original_tasks_config_path = getattr(cls, "tasks_config", "config/tasks.yaml")
+        original_bdi_agents_config_path = getattr(
+            cls, "bdi_agents_config", "config/bdi_agent.yaml"
+        )
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -43,6 +46,7 @@ def CrewBase(cls: T) -> T:
                     for attr in [
                         "is_task",
                         "is_agent",
+                        "is_bdi_agent",
                         "is_before_kickoff",
                         "is_after_kickoff",
                         "is_kickoff",
@@ -55,6 +59,9 @@ def CrewBase(cls: T) -> T:
             )
             self._original_agents = self._filter_functions(
                 self._original_functions, "is_agent"
+            )
+            self._original_bdi_agents = self._filter_functions(
+                self._original_functions, "is_bdi_agent"
             )
             self._before_kickoff = self._filter_functions(
                 self._original_functions, "is_before_kickoff"
@@ -104,11 +111,30 @@ def CrewBase(cls: T) -> T:
                 )
                 self.tasks_config = {}
 
+            if isinstance(self.original_bdi_agents_config_path, str):
+                bdi_agents_config_path = (
+                    self.base_directory / self.original_bdi_agents_config_path
+                )
+                try:
+                    self.bdi_agents_config = self.load_yaml(bdi_agents_config_path)
+                except FileNotFoundError:
+                    logging.warning(
+                        f"BDI agent config file not found at {bdi_agents_config_path}. "
+                        "Proceeding with empty BDI agent configurations."
+                    )
+                    self.bdi_agents_config = {}
+            else:
+                logging.warning(
+                    "No BDI agent configuration path provided. Proceeding with empty BDI agent configurations."
+                )
+                self.bdi_agents_config = {}
+
         @staticmethod
         def load_yaml(config_path: Path):
             try:
                 with open(config_path, "r", encoding="utf-8") as file:
-                    return yaml.safe_load(file)
+                    content = yaml.safe_load(file)
+                    return content
             except FileNotFoundError:
                 print(f"File not found: {config_path}")
                 raise
@@ -138,12 +164,13 @@ def CrewBase(cls: T) -> T:
             )
             callbacks = self._filter_functions(all_functions, "is_callback")
             agents = self._filter_functions(all_functions, "is_agent")
-
+            bdi_agents = self._filter_functions(all_functions, "is_bdi_agent")
             for agent_name, agent_info in self.agents_config.items():
                 self._map_agent_variables(
                     agent_name,
                     agent_info,
                     agents,
+                    bdi_agents,
                     llms,
                     tool_functions,
                     cache_handler_functions,
@@ -155,6 +182,7 @@ def CrewBase(cls: T) -> T:
             agent_name: str,
             agent_info: Dict[str, Any],
             agents: Dict[str, Callable],
+            bdi_agents: Dict[str, Callable],
             llms: Dict[str, Callable],
             tool_functions: Dict[str, Callable],
             cache_handler_functions: Dict[str, Callable],
@@ -189,6 +217,7 @@ def CrewBase(cls: T) -> T:
         def map_all_task_variables(self) -> None:
             all_functions = self._get_all_functions()
             agents = self._filter_functions(all_functions, "is_agent")
+            bdi_agents = self._filter_functions(all_functions, "is_bdi_agent")
             tasks = self._filter_functions(all_functions, "is_task")
             output_json_functions = self._filter_functions(
                 all_functions, "is_output_json"
@@ -204,6 +233,7 @@ def CrewBase(cls: T) -> T:
                     task_name,
                     task_info,
                     agents,
+                    bdi_agents,
                     tasks,
                     output_json_functions,
                     tool_functions,
@@ -216,6 +246,7 @@ def CrewBase(cls: T) -> T:
             task_name: str,
             task_info: Dict[str, Any],
             agents: Dict[str, Callable],
+            bdi_agents: Dict[str, Callable],
             tasks: Dict[str, Callable],
             output_json_functions: Dict[str, Callable],
             tool_functions: Dict[str, Callable],
@@ -233,7 +264,10 @@ def CrewBase(cls: T) -> T:
                 ]
 
             if agent_name := task_info.get("agent"):
-                self.tasks_config[task_name]["agent"] = agents[agent_name]()
+                if bdi_agents[agent_name]():
+                    self.tasks_config[task_name]["agent"] = bdi_agents[agent_name]()
+                else:
+                    self.tasks_config[task_name]["agent"] = agents[agent_name]()
 
             if output_json := task_info.get("output_json"):
                 self.tasks_config[task_name]["output_json"] = output_json_functions[

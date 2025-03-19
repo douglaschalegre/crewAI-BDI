@@ -7,6 +7,8 @@ from crewai.knowledge.knowledge import Knowledge
 from crewai.llm import LLM
 from crewai.process import Process
 from crewai.task import Task
+from crewai.plan import Plan
+from crewai.bdi_agent import BDIAgent
 
 warnings.filterwarnings(
     "ignore",
@@ -23,4 +25,6 @@ __all__ = [
     "LLM",
     "Flow",
     "Knowledge",
+    "BDIAgent",
+    "Plan",
 ]
