@@ -4,18 +4,18 @@ write_documentation:
     Write a documentation string explaining in a consise, comprehensive and clear manner.
   expected_output: >
     A consise, comprehensive and clear documentation string explaining the {code_function_name} function
-  agent: software_documentation_engineer
+  agent: bdi_for_docs
 
 check_for_documentation:
   description: >
     {code_function} Analyse the provided function code to determine if it contains a documentation string.
   expected_output: >
     A binary response (Yes/No) indicating whether the function has a documentation string.
-  agent: software_engineer
+  agent: bdi_for_docs
 
 evaluate_documentation_quality:
   description: >
     Assess the quality of the provided function documentation string of the function {code_function}
   expected_output: >
     A score from 0 to 100 indicating the quality of the documentation string.
-  agent: qa
+  agent: bdi_for_docs
