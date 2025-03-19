@@ -31,4 +31,5 @@ for item in context:
         }
     )
 
-doc_automation.crew().kickoff_for_each(inputs=crew_ai_input)
+# doc_automation.crew().kickoff_for_each(inputs=crew_ai_input)
+doc_automation.crew().kickoff(inputs=crew_ai_input[0])
